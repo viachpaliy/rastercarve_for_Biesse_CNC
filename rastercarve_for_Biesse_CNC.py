@@ -7,21 +7,22 @@ from math import cos, pi, tan
 
 
 class App:
-    filename =""
-    lpx = 800.0
-    lpy = 500.0
-    lpz = 19.3
-    lx = 800.0
-    ly = 500.0
-    toolname = "UGOL90"
-    work_speed = 8000
-    v_bit_angle = 90
-    depth = 2.0
-    prgname = "prog"
-    maxlines = 100000
-    stepover = 100
-    lin_resol = 0.5
+   
     def __init__(self):
+        self.filename =""
+        self.lpx = 800.0
+        self.lpy = 500.0
+        self.lpz = 19.3
+        self.lx = 800.0
+        self.ly = 500.0
+        self.toolname = "UGOL90"
+        self.work_speed = 8000
+        self.v_bit_angle = 90
+        self.depth = 2.0
+        self.prgname = "prog"
+        self.maxlines = 100000
+        self.stepover = 100
+        self.lin_resol = 0.5
         self.root = Tk()
         root=self.root
         menubar = Menu(root)
@@ -57,7 +58,7 @@ class App:
 
     def param_panel(self):
         filewin = Frame(self.root)
-        lab = Label(filewin,text="Piece data")
+        lab = Label(filewin,text="Piece data :")
         lab.pack()
         rowx = Frame(filewin)
         labx = Label(rowx,width=10, text="LPX: ")
@@ -83,10 +84,10 @@ class App:
         rowz.pack(side=TOP, fill=X)
         labz.pack(side=LEFT)
         entz.pack(side=RIGHT, expand=YES, fill=X)
-        lab1 = Label(filewin,text = "Image data")
+        lab1 = Label(filewin,text = "Image data :")
         lab1.pack()
         rowlx = Frame(filewin)
-        lablx = Label(rowlx,width=10, text="Lenght: ")
+        lablx = Label(rowlx,width=10, text="lenght: ")
         entlx= Entry(rowlx)
         entlx.insert(0, str(self.lx))
         self.entlx = entlx
@@ -94,17 +95,17 @@ class App:
         lablx.pack(side=LEFT)
         entlx.pack(side=RIGHT, expand=YES, fill=X)
         rowly = Frame(filewin)
-        lably = Label(rowly,width=10, text="Height: ")
+        lably = Label(rowly,width=10, text="height: ")
         ently= Entry(rowly)
         ently.insert(0, str(self.ly))
         self.ently = ently
         rowly.pack(side=TOP, fill=X)
         lably.pack(side=LEFT)
         ently.pack(side=RIGHT, expand=YES, fill=X)
-        lab2 =Label(filewin,text = "Milling data")
+        lab2 =Label(filewin,text = "Milling data :")
         lab2.pack()
         toolname_row = Frame(filewin)
-        toolname_lab = Label(toolname_row,width=10, text="Tool name : ")
+        toolname_lab = Label(toolname_row,width=10, text="tool name : ")
         toolname_ent= Entry(toolname_row)
         toolname_ent.insert(0, self.toolname)
         self.toolname_ent = toolname_ent
@@ -140,7 +141,7 @@ class App:
         use_blur_row.pack(side=TOP, fill=X)
         use_blur_cb.pack(side=LEFT, expand=YES, fill=X)
         rowd = Frame(filewin)
-        labd = Label(rowd,width=5, text="Depth: ")
+        labd = Label(rowd,width=5, text="depth: ")
         entd= Entry(rowd)
         entd.insert(0, str(self.depth))
         self.entd = entd
@@ -148,17 +149,17 @@ class App:
         labd.pack(side=LEFT, expand=YES, fill=X)
         entd.pack(side=RIGHT, expand=YES, fill=X)
         rowst = Frame(filewin)
-        labst = Label(rowst,width=10, text="Stepover,%: ")
+        labst = Label(rowst,width=10, text="stepover,%: ")
         entst= Entry(rowst)
         entst.insert(0, str(self.stepover))
         self.entst = entst
         rowst.pack(side=TOP, fill=X)
         labst.pack(side=LEFT,fill=X, expand=YES)
         entst.pack(side=RIGHT, expand=YES, fill=X)
-        labp = Label(filewin, text = "Programme data")
+        labp = Label(filewin, text = "Programme data :")
         labp.pack()
         rown = Frame(filewin)
-        labn = Label(rown,width=10, text="Name: ")
+        labn = Label(rown,width=10, text="name: ")
         entn= Entry(rown)
         entn.insert(0, self.prgname)
         self.entn = entn
@@ -166,7 +167,7 @@ class App:
         labn.pack(side=LEFT)
         entn.pack(side=RIGHT, expand=YES, fill=X)
         rowml = Frame(filewin)
-        labml = Label(rowml,width=12, text=" Max num lines: ")
+        labml = Label(rowml,width=12, text=" max num lines: ")
         entml= Entry(rowml)
         entml.insert(0, self.maxlines)
         self.entml = entml
@@ -194,7 +195,7 @@ class App:
 
     def piece_dialog(self):
         filewin = Toplevel(self.root)
-        lab = Label(filewin,text="Piece data")
+        lab = Label(filewin,text="Piece data :")
         lab.pack()
         rowx = Frame(filewin)
         labx = Label(rowx,width=5, text="LPX: ")
@@ -217,23 +218,23 @@ class App:
         rowz.pack(side=TOP, fill=X)
         labz.pack(side=LEFT)
         entz.pack(side=RIGHT, expand=YES, fill=X)
-        lab1 = Label(filewin,text = "Image data")
+        lab1 = Label(filewin,text = "Image data :")
         lab1.pack()
         rowlx = Frame(filewin)
-        lablx = Label(rowlx,width=5, text="Lenght: ")
+        lablx = Label(rowlx,width=5, text="lenght: ")
         entlx= Entry(rowlx)
         entlx.insert(0, str(self.lx))            
         rowlx.pack(side=TOP, fill=X)
         lablx.pack(side=LEFT)
         entlx.pack(side=RIGHT, expand=YES, fill=X)
         rowly = Frame(filewin)
-        lably = Label(rowly,width=15, text="Height: ")
+        lably = Label(rowly,width=15, text="height: ")
         ently= Entry(rowly)
         ently.insert(0, str(self.ly))            
         rowly.pack(side=TOP, fill=X)
         lably.pack(side=LEFT)
         ently.pack(side=RIGHT, expand=YES, fill=X)
-        lab2 =Label(filewin,text = "Milling data")
+        lab2 =Label(filewin,text = "Milling data :")
         lab2.pack()
         rowd = Frame(filewin)
         labd = Label(rowd,width=5, text="Depth: ")
@@ -242,17 +243,17 @@ class App:
         rowd.pack(side=TOP, fill=X)
         labd.pack(side=LEFT)
         entd.pack(side=RIGHT, expand=YES, fill=X)
-        labp = Label(filewin, text = "Programme data")
+        labp = Label(filewin, text = "Programme data :")
         labp.pack()
         rown = Frame(filewin)
-        labn = Label(rown,width=5, text="Name: ")
+        labn = Label(rown,width=5, text="name: ")
         entn= Entry(rown)
         entn.insert(0, self.prgname)            
         rown.pack(side=TOP, fill=X)
         labn.pack(side=LEFT)
         entn.pack(side=RIGHT, expand=YES, fill=X)
         rowml = Frame(filewin)
-        labml = Label(rowml,width=5, text=" Max num lines: ")
+        labml = Label(rowml,width=5, text=" max num lines: ")
         entml= Entry(rowml)
         entml.insert(0, self.maxlines)            
         rowml.pack(side=TOP, fill=X)
