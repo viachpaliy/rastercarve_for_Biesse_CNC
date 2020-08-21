@@ -1,9 +1,9 @@
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 from tkinter.messagebox import askquestion, showerror
 from PIL.ImageTk import PhotoImage
 from PIL import Image, ImageTk, ImageFilter
-from math import cos, pi, tan
+from math import cos, pi, tan, sqrt, sin
 
 
 class App:
@@ -22,6 +22,7 @@ class App:
         self.prgname = "prog"
         self.maxlines = 100000
         self.stepover = 100
+        self.strategy = 'angle45'
         self.lin_resol = 0.5
         self.root = Tk()
         root=self.root
@@ -156,6 +157,14 @@ class App:
         rowst.pack(side=TOP, fill=X)
         labst.pack(side=LEFT,fill=X, expand=YES)
         entst.pack(side=RIGHT, expand=YES, fill=X)
+        rowstrat = Frame(filewin)
+        labstrat = Label(rowstrat,width=10, text="strategy : ")
+        combostrat = ttk.Combobox(rowstrat,values=['angle45','circle','spiral'])
+        combostrat.current(0)
+        self.combostrat = combostrat
+        rowstrat.pack(side=TOP, fill=X)
+        labstrat.pack(side=LEFT,fill=X, expand=YES)
+        combostrat.pack(side=RIGHT, expand=YES, fill=X)
         labp = Label(filewin, text = "Programme data :")
         labp.pack()
         rown = Frame(filewin)
@@ -192,6 +201,7 @@ class App:
         self.work_speed = float(self.work_speed_ent.get())
         self.v_bit_angle = float(self.v_bit_angle_ent.get())
         self.lin_resol =  float(self.lin_resol_ent.get())
+        self.strategy = self.combostrat.get()
 
     def piece_dialog(self):
         filewin = Toplevel(self.root)
@@ -329,6 +339,85 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         return "  @ LINE_EP, "", "", 95894956, "", 0 : {0:3.3f}, {1:3.3f}, 0, {2:3.3f}, 0, 0, 0, 0, 0\n".format(x,y,z)
 
     def create_files(self):
+        print('strategy : {}'.format(self.strategy))
+        if self.strategy=='angle45':
+            self.angle45_strategy()
+        if self.strategy=='circle':
+            self.circle_strategy()
+
+    def circle_strategy(self):
+        if self.filename=="":
+            showerror('Error!',"Open a image")
+            return
+        prg = self.header()
+        prg = prg + self.variables()
+        prg = prg + self.programstart()
+        print(prg)
+        im=Image.open(self.filename)
+        if self.use_blur.get():
+            im=im.filter(ImageFilter.GaussianBlur(radius=2))
+        depth = self.depth
+        step = 2 * depth *tan(self.v_bit_angle * pi/360) * self.stepover / 100 
+        n = int(sqrt(self.lx**2 +self.ly**2)/(2*step))
+        ni = 0
+        fi = 0
+        out_f = self.prgname + ".bpp"
+        for ki in range(1,n):
+            ri = step * ki
+            alfa_step = pi * self.lin_resol / ri
+            alfa = 0
+            zi = 0.0
+            start_flag = True
+            while alfa <= (2 * pi + alfa_step) :
+                
+                zo = zi
+                xi = self.lx/2 + ri * cos(alfa)
+                yi = self.ly/2 + ri * sin(alfa)
+                if ((xi < self.lx) & (xi >0) & (yi < self.ly) & (yi > 0)):
+                    if start_flag:
+                        start_flag = False
+                        zi = 0.0
+                        prg = prg + self.startpoint(xi, yi)
+                    i = int (round(xi * im.size[0] / self.lx))
+                    j = int (round(yi * im.size[1] / self.ly))
+                    if i<0:
+                        i=0
+                    if i>im.size[0]-1:
+                        i=im.size[0]-1
+                    if j<0:
+                        j=0
+                    if j>im.size[1]-1:
+                        j=im.size[1]-1
+                    gray = 0.299 * im.getpixel((i,j))[0] + 0.587 * im.getpixel((i,j))[1] + 0.114 * im.getpixel((i,j))[2]
+                    gray = 256 - gray
+                    zi = depth * gray /255
+                    dz = zi - zo         
+                    prg = prg + self.prog_line(xi, yi, dz)
+                    print(self.prog_line(xi, yi, dz))
+                    ni = ni +1
+                else:
+                    start_flag = True
+                alfa += alfa_step
+            if ni > self.maxlines :
+                ni = 0
+                prg = prg + self.prog_end()
+                print(self.prog_end())
+                fo = open(out_f, "w")
+                fo.write(prg)
+                fo.close()
+                fi = fi + 1
+                out_f = self.prgname + str(fi) +".bpp"
+                prg = self.header()
+                prg = prg + self.variables()
+                prg = prg + self.programstart()
+        prg = prg + self.prog_end()
+        print(self.prog_end())
+        fo = open(out_f, "w")
+        fo.write(prg)
+        fo.close()
+        return prg
+    
+    def angle45_strategy(self):
         if self.filename=="":
             showerror('Error!',"Open a image")
             return
