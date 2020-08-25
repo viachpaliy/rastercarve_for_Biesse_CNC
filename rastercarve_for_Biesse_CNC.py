@@ -344,6 +344,82 @@ PAN=FASTVERTBORINGSVALUE|0||4|
             self.angle45_strategy()
         if self.strategy=='circle':
             self.circle_strategy()
+        if self.strategy=='spiral':
+            self.spiral_strategy()
+
+    def spiral_strategy(self):
+        if self.filename=="":
+            showerror('Error!',"Open a image")
+            return
+        prg = self.header()
+        prg = prg + self.variables()
+        prg = prg + self.programstart()
+        print(prg)
+        im=Image.open(self.filename)
+        if self.use_blur.get():
+            im=im.filter(ImageFilter.GaussianBlur(radius=2))
+        depth = self.depth
+        step = 2 * depth *tan(self.v_bit_angle * pi/360) * self.stepover / 100
+        rmax = sqrt(self.lx**2 +self.ly**2) / 2
+        ri = step/2
+        alfa = 0
+        zo =0.0
+        zi = 0.0
+        start_flag = True
+        ni = 0
+        fi = 0
+        out_f = self.prgname + ".bpp"
+        while ri <= rmax :
+            zo = zi
+            xi = self.lx/2 + ri * cos(alfa)
+            yi = self.ly/2 + ri * sin(alfa)
+            if ((xi < self.lx) & (xi >0) & (yi < self.ly) & (yi > 0)):
+                if start_flag:
+                    start_flag = False
+                    zo = 0.0
+                    prg = prg + self.startpoint(xi, yi)
+                i = int (round(xi * im.size[0] / self.lx))
+                j = int (round(yi * im.size[1] / self.ly))
+                if i<0:
+                    i=0
+                if i>im.size[0]-1:
+                    i=im.size[0]-1
+                if j<0:
+                    j=0
+                if j>im.size[1]-1:
+                    j=im.size[1]-1
+                gray = 0.299 * im.getpixel((i,j))[0] + 0.587 * im.getpixel((i,j))[1] + 0.114 * im.getpixel((i,j))[2]
+                gray = 256 - gray
+                zi = depth * gray /255
+                dz = zi - zo         
+                prg = prg + self.prog_line(xi, yi, dz)
+                print(self.prog_line(xi, yi, dz))
+                ni = ni +1
+            else:
+                start_flag = True
+            alfa_step = pi * self.lin_resol / ri
+            alfa += alfa_step
+            ri = step/2 + step * alfa / (2 * pi)
+            if ni > self.maxlines :
+                ni = 0
+                prg = prg + self.prog_end()
+                print(self.prog_end())
+                fo = open(out_f, "w")
+                fo.write(prg)
+                fo.close()
+                fi = fi + 1
+                out_f = self.prgname + str(fi) +".bpp"
+                prg = self.header()
+                prg = prg + self.variables()
+                prg = prg + self.programstart()
+                start_flag = True
+        prg = prg + self.prog_end()
+        print(self.prog_end())
+        fo = open(out_f, "w")
+        fo.write(prg)
+        fo.close()
+        return prg
+            
 
     def circle_strategy(self):
         if self.filename=="":
@@ -410,6 +486,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 prg = self.header()
                 prg = prg + self.variables()
                 prg = prg + self.programstart()
+                start_flag = True
         prg = prg + self.prog_end()
         print(self.prog_end())
         fo = open(out_f, "w")
