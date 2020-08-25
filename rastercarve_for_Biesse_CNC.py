@@ -362,21 +362,21 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         ni = 0
         fi = 0
         out_f = self.prgname + ".bpp"
-        for ki in range(1,n):
-            ri = step * ki
+        for ki in range(0,n):
+            ri = step * (ki + 0.5)
             alfa_step = pi * self.lin_resol / ri
             alfa = 0
             zi = 0.0
             start_flag = True
             while alfa <= (2 * pi + alfa_step) :
-                
+               
                 zo = zi
                 xi = self.lx/2 + ri * cos(alfa)
                 yi = self.ly/2 + ri * sin(alfa)
                 if ((xi < self.lx) & (xi >0) & (yi < self.ly) & (yi > 0)):
                     if start_flag:
                         start_flag = False
-                        zi = 0.0
+                        zo = 0.0
                         prg = prg + self.startpoint(xi, yi)
                     i = int (round(xi * im.size[0] / self.lx))
                     j = int (round(yi * im.size[1] / self.ly))
