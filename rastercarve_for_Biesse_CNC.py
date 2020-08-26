@@ -360,7 +360,8 @@ PAN=FASTVERTBORINGSVALUE|0||4|
             im=im.filter(ImageFilter.GaussianBlur(radius=2))
         depth = self.depth
         step = 2 * depth *tan(self.v_bit_angle * pi/360) * self.stepover / 100
-        rmax = sqrt(self.lx**2 +self.ly**2) / 2
+        rmax = sqrt(self.lx**2 +self.ly**2) / 2 
+        rmax = rmax - step
         ri = step/2
         alfa = 0
         zo =0.0
