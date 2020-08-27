@@ -51,11 +51,12 @@ class App:
 
     def open_file(self):
         self.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-        self.root.title(self.filename)
-        load = Image.open(self.filename)
-        img = ImageTk.PhotoImage(load)
-        self.canvas.create_image(2, 2, anchor=NW, image = img)
-        self.canvas.image = img
+        if self.filename != "": 
+            self.root.title(self.filename)
+            load = Image.open(self.filename)
+            img = ImageTk.PhotoImage(load)
+            self.canvas.create_image(2, 2, anchor=NW, image = img)
+            self.canvas.image = img
 
     def param_panel(self):
         filewin = Frame(self.root)
