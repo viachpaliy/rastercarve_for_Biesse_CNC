@@ -228,7 +228,10 @@ PAN=ENABLELABEL|0||0|
         return strin
 
     def programstart(self):
-        strin ='[PROGRAM]\n@ ROUT, "TDCODE1", "", 43308176, "" : "P1001", 0, "1", 0, 0, "", 1, 11, -1, 0, 0, 32, 32, 50, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0\n'
+        dx = (self.lpx - self.lx)/2
+        dy = (self.lpy - self.ly)/2
+        strin ='[PROGRAM]\n@ SHIFT, "", "", 249689336, "" : {0:3.3f}, {1:3.3f}\n'.format(dx, dy)
+        strin = strin + '@ ROUT, "TDCODE1", "", 43308176, "" : "P1001", 0, "1", 0, 0, "", 1, 11, -1, 0, 0, 32, 32, 50, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0\n'
         return strin
 
     
@@ -239,6 +242,8 @@ PAN=ENABLELABEL|0||0|
         return 'Call ProgBuilder.AddPoint(65, 43303376, ""    , ({0:3.3f})*FCN, ({1:3.3f})*FCN, (0)*FCN)\n'.format(x,y)
 
     def vbscript_start(self):
+        dx = (self.lpx - self.lx)/2
+        dy = (self.lpy - self.ly)/2
         strin = """[VBSCRIPT]
 Option Explicit
 Dim mm: mm = 1.000000000000000000
@@ -269,9 +274,10 @@ Dim CALCEDTH: CALCEDTH = 0
 Dim ENABLELABEL: ENABLELABEL = 0
 Sub Main()Call ProgBuilder.SetPanel(LPX*FCN, LPY*FCN, LPZ*FCN, ORLST, SIMMETRY, TLCHK, TOOLING, CUSTSTR, \
 FCN, XCUT*FCN, YCUT*FCN, JIGTH*FCN, CKOP, UNIQUE, MATERIAL, PUTLST, OPPWKRS, UNICLAMP, CHKCOLL, WTPIANI, COLLTOOL, CALCEDTH, ENABLELABEL)
+Call ProgBuilder.AddShift(0, 249689336, ""    , ({3:3.3f})*FCN, ({4:3.3f})*FCN)
 SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1", (0)*FCN, (2)*FCN, "", YES, (11)*FCN, rpNO, (0)*FCN, \
 (0)*FCN, (32)*FCN, (32)*FCN, (50)*FCN, 0, 45, YES, 0, 0, 0, (0)*FCN, (0)*FCN, azrNO, NO, NO, NO, 0, (0)*FCN, YES, NO, (0)*FCN, 0, NO, 0,\
-(0)*FCN, 0, (0)*FCN, NO, (0)*FCN, YES, 0, -1, (0)*FCN)\n""".format(self.lpx, self.lpy, self.lpz)
+(0)*FCN, 0, (0)*FCN, NO, (0)*FCN, YES, 0, -1, (0)*FCN)\n""".format(self.lpx, self.lpy, self.lpz,dx,dy)
         return strin
 
     def prog_end(self):
