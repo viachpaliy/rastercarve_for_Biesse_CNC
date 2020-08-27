@@ -20,7 +20,7 @@ class App:
         self.v_bit_angle = 90
         self.depth = 2.0
         self.prgname = "prog"
-        self.maxlines = 50000
+        self.maxlines = 100000
         self.stepover = 100
         self.lin_resol = 0.5
         self.vbscript = ""
@@ -50,11 +50,12 @@ class App:
 
     def open_file(self):
         self.filename =  filedialog.askopenfilename(initialdir = "/",title = "Выбрать файл",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-        self.root.title(self.filename)
-        load = Image.open(self.filename)
-        img = ImageTk.PhotoImage(load)
-        self.canvas.create_image(2, 2, anchor=NW, image = img)
-        self.canvas.image = img
+        if self.filename != "": 
+            self.root.title(self.filename)
+            load = Image.open(self.filename)
+            img = ImageTk.PhotoImage(load)
+            self.canvas.create_image(2, 2, anchor=NW, image = img)
+            self.canvas.image = img
 
     def param_panel(self):
         filewin = Frame(self.root)
@@ -227,7 +228,7 @@ PAN=ENABLELABEL|0||0|
         return strin
 
     def programstart(self):
-        strin ='[PROGRAM]\n@ ROUT, "TDCODE0", "", 43308176, "" : "P1001", 0, "1", 0, 0, "", 1, 11, -1, 0, 0, 32, 32, 50, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0\n'
+        strin ='[PROGRAM]\n@ ROUT, "TDCODE1", "", 43308176, "" : "P1001", 0, "1", 0, 0, "", 1, 11, -1, 0, 0, 32, 32, 50, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0\n'
         return strin
 
     
@@ -274,7 +275,14 @@ SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1"
         return strin
 
     def prog_end(self):
-        strin ='  @ ENDPATH, "", "", 43307792, "" :\n\n' + self.vbscript_start()+self.vbscript+self.vb_end()+ '[MACRODATA]\n[TDCODES]\nVER=1\nCONVF=1.000000\nBUGFLAGS=3\n(MST)\n(GEN)\n(TOO)\n(IO)\n(WRK)\n(SPD)\n(MOR)'
+        strin ='  @ ENDPATH, "", "", 43307792, "" :\n\n' + self.vbscript_start()+self.vbscript+self.vb_end()
+        strin = strin + '[MACRODATA]\n\n[TDCODES]\nVER=1\nCONVF=1.000000\nBUGFLAGS=3\n'
+        strin = strin + '(MST)<LN=1,NJ=TDCODE1,TYW=2,NT=1,>\n(GEN)<WT=2,DL=0,>\n'
+        strin = strin + '(TOO)<DI=11.0000,SP=11.0000,CL=1,COD={0},RO=-1,TY=100,ACT=0,NCT=,DCT=5.000000,TCT=0.000000,DICT=20.000000,DFCT=80.000000,PCT=60.000000,>\n'.format(self.toolname)
+        strin = strin + '(IO)<AI=0.000,AO=0.000,DA=0.000,DT=0.000,DD=0.000,IFD=0.00,OFD=0.00,IN=0,OUT=0,PR=0,ETCI=0,ITI=0,TLI=0.00,THI=0.00,ETCO=0,ITO=0,TLO=0.00,THO=0.00,PDI=0.00,PDO=0.00,>\n'
+        strin = strin + '(WRK)<OP=1,CO=0,HH=0.000,DR=0,PV=0,PT=0,TC=0,DP=5,SM=0,TT=0,RC=0,BD=0,SW=0,IC="",IM="",IA="",PC=0,BL=0,PU=0,EA=0,EEA=0,SP=0,AP=0,ESB=0,>\n'
+        strin = strin + '(SPD)<AF=0.00,CF=0.000,DS=0.00,FE=8000,RT=0.00,OF=0.00,>\n'
+        strin = strin + '(MOR)<PE=0.000000,TG=0.000000,TL=0.000000,WH=0.000000,>\n\n[PCF]\n\n[TOOLING]\n'
         return strin
 
     def vb_end(self):
@@ -336,7 +344,7 @@ SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1"
                 dy = yi - yo
                 prg = prg + self.prog_line(dx, dy, dz)
                 self.vbscript = self.vbscript + self.vb_line(dx, dy, dz)
-                ni = ni +1
+                ni = ni + 2
                 xo = xi
                 yo = yi
                 xi = xi - step_xy
