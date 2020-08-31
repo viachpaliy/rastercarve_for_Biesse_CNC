@@ -1,9 +1,9 @@
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 from tkinter.messagebox import askquestion, showerror
 from PIL.ImageTk import PhotoImage
 from PIL import Image, ImageTk, ImageFilter
-from math import cos, pi, tan
+from math import cos, pi, tan, sqrt, sin
 
 
 class App:
@@ -23,7 +23,9 @@ class App:
         self.maxlines = 100000
         self.stepover = 100
         self.lin_resol = 0.5
+        self.strategy = 'angle45'
         self.vbscript = ""
+        self.orlst = "1"
         self.root = Tk()
         root=self.root
         menubar = Menu(root)
@@ -85,6 +87,14 @@ class App:
         rowz.pack(side=TOP, fill=X)
         labz.pack(side=LEFT)
         entz.pack(side=RIGHT, expand=YES, fill=X)
+        row_orlst = Frame(filewin)
+        lab_orlst = Label(row_orlst,width=10, text="Список нач. координат: ")
+        ent_orlst= Entry(row_orlst)
+        ent_orlst.insert(0,str(self.orlst))
+        self.ent_orlst = ent_orlst
+        row_orlst.pack(side=TOP, fill=X)
+        lab_orlst.pack(side=LEFT, expand=YES, fill=X)
+        ent_orlst.pack(side=RIGHT,fill=X)
         lab1 = Label(filewin,text = "Данные гравировки :")
         lab1.pack()
         rowlx = Frame(filewin)
@@ -157,6 +167,14 @@ class App:
         rowst.pack(side=TOP, fill=X)
         labst.pack(side=LEFT,fill=X, expand=YES)
         entst.pack(side=RIGHT, expand=YES, fill=X)
+        rowstrat = Frame(filewin)
+        labstrat = Label(rowstrat,width=10, text="тип линии : ")
+        combostrat = ttk.Combobox(rowstrat,values=['angle45','circle','spiral'])
+        combostrat.current(0)
+        self.combostrat = combostrat
+        rowstrat.pack(side=TOP, fill=X)
+        labstrat.pack(side=LEFT,fill=X, expand=YES)
+        combostrat.pack(side=RIGHT, expand=YES, fill=X)
         labp = Label(filewin, text = "Данные программы :")
         labp.pack()
         rown = Frame(filewin)
@@ -193,7 +211,8 @@ class App:
         self.work_speed = float(self.work_speed_ent.get())
         self.v_bit_angle = float(self.v_bit_angle_ent.get())
         self.lin_resol =  float(self.lin_resol_ent.get())
-
+        self.strategy = self.combostrat.get()
+        self.orlst = self.ent_orlst.get()
     
             
     def header(self):
@@ -204,7 +223,7 @@ class App:
 PAN=LPX|{0:3.3f}||4|
 PAN=LPY|{1:3.3f}||4|
 PAN=LPZ|{2:3.3f}||4|
-PAN=ORLST|"1"||0|
+PAN=ORLST|"{3}"||0|
 PAN=SIMMETRY|1||0|
 PAN=TLCHK|0||0|
 PAN=TOOLING|""||0|
@@ -224,7 +243,7 @@ PAN=WTPIANI|0||0|
 PAN=COLLTOOL|0||0|
 PAN=CALCEDTH|0||0|
 PAN=ENABLELABEL|0||0|
-\n""".format(self.lpx, self.lpy, self.lpz)
+\n""".format(self.lpx, self.lpy, self.lpz, self.orlst)
         return strin
 
     def programstart(self):
@@ -252,7 +271,7 @@ Dim SIDE: SIDE = -1
 Dim LPX: LPX = {0:3.3f}
 Dim LPY: LPY = {1:3.3f}
 Dim LPZ: LPZ = {2:3.3f}
-Dim ORLST: ORLST = "1"
+Dim ORLST: ORLST = "{5}"
 Dim SIMMETRY: SIMMETRY = 1
 Dim TLCHK: TLCHK = 0
 Dim TOOLING: TOOLING = ""
@@ -277,7 +296,7 @@ FCN, XCUT*FCN, YCUT*FCN, JIGTH*FCN, CKOP, UNIQUE, MATERIAL, PUTLST, OPPWKRS, UNI
 Call ProgBuilder.AddShift(0, 249689336, ""    , ({3:3.3f})*FCN, ({4:3.3f})*FCN)
 SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1", (0)*FCN, (2)*FCN, "", YES, (11)*FCN, rpNO, (0)*FCN, \
 (0)*FCN, (32)*FCN, (32)*FCN, (50)*FCN, 0, 45, YES, 0, 0, 0, (0)*FCN, (0)*FCN, azrNO, NO, NO, NO, 0, (0)*FCN, YES, NO, (0)*FCN, 0, NO, 0,\
-(0)*FCN, 0, (0)*FCN, NO, (0)*FCN, YES, 0, -1, (0)*FCN)\n""".format(self.lpx, self.lpy, self.lpz,dx,dy)
+(0)*FCN, 0, (0)*FCN, NO, (0)*FCN, YES, 0, -1, (0)*FCN)\n""".format(self.lpx, self.lpy, self.lpz,dx,dy,self.orlst)
         return strin
 
     def prog_end(self):
@@ -287,7 +306,7 @@ SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1"
         strin = strin + '(TOO)<DI=11.0000,SP=11.0000,CL=1,COD={0},RO=-1,TY=100,ACT=0,NCT=,DCT=5.000000,TCT=0.000000,DICT=20.000000,DFCT=80.000000,PCT=60.000000,>\n'.format(self.toolname)
         strin = strin + '(IO)<AI=0.000,AO=0.000,DA=0.000,DT=0.000,DD=0.000,IFD=0.00,OFD=0.00,IN=0,OUT=0,PR=0,ETCI=0,ITI=0,TLI=0.00,THI=0.00,ETCO=0,ITO=0,TLO=0.00,THO=0.00,PDI=0.00,PDO=0.00,>\n'
         strin = strin + '(WRK)<OP=1,CO=0,HH=0.000,DR=0,PV=0,PT=0,TC=0,DP=5,SM=0,TT=0,RC=0,BD=0,SW=0,IC="",IM="",IA="",PC=0,BL=0,PU=0,EA=0,EEA=0,SP=0,AP=0,ESB=0,>\n'
-        strin = strin + '(SPD)<AF=0.00,CF=0.000,DS=0.00,FE=8000,RT=0.00,OF=0.00,>\n'
+        strin = strin + '(SPD)<AF=0.00,CF=0.000,DS=0.00,FE={0:5.0f},RT=0.00,OF=0.00,>\n'.format(self.work_speed)
         strin = strin + '(MOR)<PE=0.000000,TG=0.000000,TL=0.000000,WH=0.000000,>\n\n[PCF]\n\n[TOOLING]\n'
         return strin
 
@@ -302,6 +321,179 @@ SIDE = 0: Call ProgBuilder.StartRout(0, 43308176, "TDCODE0"    , "P1001", 0, "1"
 
 
     def create_files(self):
+        if self.strategy=='angle45':
+            self.angle45_strategy()
+        if self.strategy=='circle':
+            self.circle_strategy()
+        if self.strategy=='spiral':
+            self.spiral_strategy()
+
+    def spiral_strategy(self):
+        if self.filename=="":
+            showerror('Error!',"Open a image")
+            return
+        prg = self.header()
+        prg = prg + self.variables()
+        prg = prg + self.programstart()
+        im=Image.open(self.filename)
+        if self.use_blur.get():
+            im=im.filter(ImageFilter.GaussianBlur(radius=2))
+        depth = self.depth
+        step = 2 * depth *tan(self.v_bit_angle * pi/360) * self.stepover / 100
+        rmax = sqrt(self.lx**2 +self.ly**2) / 2 
+        rmax = rmax - step
+        ri = step/2
+        alfa = 0
+        zo =0.0
+        zi = 0.0
+        start_flag = True
+        ni = 0
+        fi = 0
+        out_f = self.prgname + ".bpp"
+        while ri <= rmax :
+            zo = zi
+            xi = self.lx/2 + ri * cos(alfa)
+            yi = self.ly/2 + ri * sin(alfa)
+            if ((xi < self.lx) & (xi >0) & (yi < self.ly) & (yi > 0)):
+                if start_flag:
+                    start_flag = False
+                    zo = 0.0
+                    xo = xi
+                    yo = yi
+                    prg = prg + self.startpoint(xi, yi)
+                    self.vbscript = self.vbscript + self.vb_startpoint(xi,yi)
+                i = int (round(xi * im.size[0] / self.lx))
+                j = int (round(yi * im.size[1] / self.ly))
+                if i<0:
+                    i=0
+                if i>im.size[0]-1:
+                    i=im.size[0]-1
+                if j<0:
+                    j=0
+                if j>im.size[1]-1:
+                    j=im.size[1]-1
+                gray = 0.299 * im.getpixel((i,j))[0] + 0.587 * im.getpixel((i,j))[1] + 0.114 * im.getpixel((i,j))[2]
+                gray = 256 - gray
+                zi = depth * gray /255
+                dz = zi - zo
+                dx = xi - xo
+                dy = yi - yo
+                prg = prg + self.prog_line(dx, dy, dz)
+                self.vbscript = self.vbscript + self.vb_line(dx, dy, dz)
+                ni = ni + 2
+                xo = xi
+                yo = yi
+    
+            else:
+                start_flag = True
+            alfa_step = pi * self.lin_resol / ri
+            alfa += alfa_step
+            ri = step/2 + step * alfa / (2 * pi)
+            if ni > self.maxlines :
+                ni = 0
+                prg = prg + self.prog_end()
+                
+                fo = open(out_f, "w")
+                fo.write(prg)
+                fo.close()
+                fi = fi + 1
+                out_f = self.prgname + str(fi) +".bpp"
+                prg = self.header()
+                prg = prg + self.variables()
+                prg = prg + self.programstart()
+                self.vbscript = ""
+                start_flag = True
+        prg = prg + self.prog_end()
+        
+        fo = open(out_f, "w")
+        fo.write(prg)
+        fo.close()
+        return prg
+            
+
+    def circle_strategy(self):
+        if self.filename=="":
+            showerror('Error!',"Open a image")
+            return
+        prg = self.header()
+        prg = prg + self.variables()
+        prg = prg + self.programstart()
+        
+        im=Image.open(self.filename)
+        if self.use_blur.get():
+            im=im.filter(ImageFilter.GaussianBlur(radius=2))
+        depth = self.depth
+        step = 2 * depth *tan(self.v_bit_angle * pi/360) * self.stepover / 100 
+        n = int(sqrt(self.lx**2 +self.ly**2)/(2*step))
+        ni = 0
+        fi = 0
+        out_f = self.prgname + ".bpp"
+        for ki in range(0,n):
+            ri = step * (ki + 0.5)
+            alfa_step = pi * self.lin_resol / ri
+            alfa = 0
+            zi = 0.0
+            start_flag = True
+            while alfa <= (2 * pi + alfa_step) :
+               
+                zo = zi
+                xi = self.lx/2 + ri * cos(alfa)
+                yi = self.ly/2 + ri * sin(alfa)
+                if ((xi < self.lx) & (xi >0) & (yi < self.ly) & (yi > 0)):
+                    if start_flag:
+                        start_flag = False
+                        zo = 0.0
+                        xo = xi
+                        yo = yi
+                        prg = prg + self.startpoint(xi, yi)
+                        self.vbscript = self.vbscript + self.vb_startpoint(xi,yi)
+                    i = int (round(xi * im.size[0] / self.lx))
+                    j = int (round(yi * im.size[1] / self.ly))
+                    if i<0:
+                        i=0
+                    if i>im.size[0]-1:
+                        i=im.size[0]-1
+                    if j<0:
+                        j=0
+                    if j>im.size[1]-1:
+                        j=im.size[1]-1
+                    gray = 0.299 * im.getpixel((i,j))[0] + 0.587 * im.getpixel((i,j))[1] + 0.114 * im.getpixel((i,j))[2]
+                    gray = 256 - gray
+                    zi = depth * gray /255
+                    dz = zi - zo
+                    dx = xi - xo
+                    dy = yi - yo
+                    prg = prg + self.prog_line(dx, dy, dz)
+                    self.vbscript = self.vbscript + self.vb_line(dx, dy, dz)
+                    ni = ni + 2
+                    xo = xi
+                    yo = yi
+                   
+                else:
+                    start_flag = True
+                alfa += alfa_step
+            if ni > self.maxlines :
+                ni = 0
+                prg = prg + self.prog_end()
+                
+                fo = open(out_f, "w")
+                fo.write(prg)
+                fo.close()
+                fi = fi + 1
+                out_f = self.prgname + str(fi) +".bpp"
+                prg = self.header()
+                prg = prg + self.variables()
+                prg = prg + self.programstart()
+                self.vbscript = ""
+                start_flag = True
+        prg = prg + self.prog_end()
+        
+        fo = open(out_f, "w")
+        fo.write(prg)
+        fo.close()
+        return prg
+
+    def angle45_strategy(self):
         if self.filename=="":
             showerror('Error!',"Open a image")
             return

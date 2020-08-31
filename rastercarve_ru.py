@@ -257,7 +257,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         dy = (self.lpy - self.ly)/2
         strin = '[PROGRAM]\n    @ SHIFT, "", "", 374974684, "", 0 : {0:3.3f}, {1:3.3f}\n'.format(dx, dy)
         strin = strin + '    @ ROUT, "", "", 95893420, "", 0 : "P1001", 0, "1", 0, 0, "", 1, 1.6, -1, 0, 0, 32, 32, 50, 0, 45, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0,'
-        strin = strin + '{0:4.0f},"{1:s}", 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 5, 0, 20, 80, 60,'.format(self.work_speed,self.toolname)
+        strin = strin + '{0:5.0f},"{1:s}", 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, "", 5, 0, 20, 80, 60,'.format(self.work_speed,self.toolname)
         strin = strin + ', 0, "", "", "ROUT", 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0, 0, 0, 99, 0\n'
         return strin
     
@@ -271,7 +271,6 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         return "  @ LINE_EP, "", "", 95894956, "", 0 : {0:3.3f}, {1:3.3f}, 0, {2:3.3f}, 0, 0, 0, 0, 0\n".format(x,y,z)
 
     def create_files(self):
-        print('strategy : {}'.format(self.strategy))
         if self.strategy=='angle45':
             self.angle45_strategy()
         if self.strategy=='circle':
@@ -286,7 +285,6 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         prg = self.header()
         prg = prg + self.variables()
         prg = prg + self.programstart()
-        print(prg)
         im=Image.open(self.filename)
         if self.use_blur.get():
             im=im.filter(ImageFilter.GaussianBlur(radius=2))
@@ -326,7 +324,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 zi = depth * gray /255
                 dz = zi - zo         
                 prg = prg + self.prog_line(xi, yi, dz)
-                print(self.prog_line(xi, yi, dz))
+                
                 ni = ni +1
             else:
                 start_flag = True
@@ -336,7 +334,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
             if ni > self.maxlines :
                 ni = 0
                 prg = prg + self.prog_end()
-                print(self.prog_end())
+                
                 fo = open(out_f, "w")
                 fo.write(prg)
                 fo.close()
@@ -347,7 +345,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 prg = prg + self.programstart()
                 start_flag = True
         prg = prg + self.prog_end()
-        print(self.prog_end())
+        
         fo = open(out_f, "w")
         fo.write(prg)
         fo.close()
@@ -361,7 +359,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         prg = self.header()
         prg = prg + self.variables()
         prg = prg + self.programstart()
-        print(prg)
+        
         im=Image.open(self.filename)
         if self.use_blur.get():
             im=im.filter(ImageFilter.GaussianBlur(radius=2))
@@ -402,7 +400,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                     zi = depth * gray /255
                     dz = zi - zo         
                     prg = prg + self.prog_line(xi, yi, dz)
-                    print(self.prog_line(xi, yi, dz))
+                    
                     ni = ni +1
                 else:
                     start_flag = True
@@ -410,7 +408,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
             if ni > self.maxlines :
                 ni = 0
                 prg = prg + self.prog_end()
-                print(self.prog_end())
+                
                 fo = open(out_f, "w")
                 fo.write(prg)
                 fo.close()
@@ -421,7 +419,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 prg = prg + self.programstart()
                 start_flag = True
         prg = prg + self.prog_end()
-        print(self.prog_end())
+        
         fo = open(out_f, "w")
         fo.write(prg)
         fo.close()
@@ -434,7 +432,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
         prg = self.header()
         prg = prg + self.variables()
         prg = prg + self.programstart()
-        print(prg)
+        
         im=Image.open(self.filename)
         if self.use_blur.get():
             im=im.filter(ImageFilter.GaussianBlur(radius=2))
@@ -453,7 +451,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 yi = xi - self.lx
                 xi = self.lx
             prg = prg + self.startpoint(xi, yi)
-            print(self.startpoint(xi, yi))
+            
             while ((xi > 0.0) & (yi < self.ly)):
                 zo = zi
                 i = int (round(xi * im.size[0] / self.lx))
@@ -471,14 +469,14 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 zi = depth * gray /255
                 dz = zi - zo         
                 prg = prg + self.prog_line(xi, yi, dz)
-                print(self.prog_line(xi, yi, dz))
+                
                 ni = ni +1
                 xi = xi - step_xy
                 yi = yi + step_xy
             if ni > self.maxlines :
                 ni = 0
                 prg = prg + self.prog_end()
-                print(self.prog_end())
+                
                 fo = open(out_f, "w")
                 fo.write(prg)
                 fo.close()
@@ -488,7 +486,7 @@ PAN=FASTVERTBORINGSVALUE|0||4|
                 prg = prg + self.variables()
                 prg = prg + self.programstart()
         prg = prg + self.prog_end()
-        print(self.prog_end())
+       
         fo = open(out_f, "w")
         fo.write(prg)
         fo.close()
