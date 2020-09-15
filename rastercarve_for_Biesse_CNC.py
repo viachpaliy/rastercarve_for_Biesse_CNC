@@ -159,7 +159,7 @@ class App:
         labst.pack(side=LEFT,fill=X, expand=YES)
         entst.pack(side=RIGHT, expand=YES, fill=X)
         rowstrat = Frame(filewin)
-        labstrat = Label(rowstrat,width=10, text="strategy : ")
+        labstrat = Label(rowstrat,width=10, text="type of lines : ")
         combostrat = ttk.Combobox(rowstrat,values=['angle45','circle','spiral'])
         combostrat.current(0)
         self.combostrat = combostrat
